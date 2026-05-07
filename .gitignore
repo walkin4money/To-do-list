@@ -1,0 +1,64 @@
+# Visual Studio
+.vs/
+Debug/
+Release/
+x64/
+x86/
+Win32/
+Debug_x64/
+Release_x64/
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcxproj.user? 
+*.sln
+*.slnx
+*.suo
+*.user
+*.userprefs
+*.db
+*.opendb
+
+# Build artifacts
+*.exe
+*.obj
+*.o
+*.lib
+*.dll
+*.so
+*.dylib
+*.exp
+*.pdb
+*.ilk
+*.log
+
+# Compiled output folders
+bin/
+obj/
+out/
+
+# Data files (user data, not code)
+*.csv
+*.txt
+!README.txt
+!requirements.txt
+
+# Temporary files
+*.tmp
+*.temp
+*.cache
+*.vsidx
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# CMake (если используешь)
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
