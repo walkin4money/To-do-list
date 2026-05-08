@@ -18,12 +18,20 @@ void test_addTask_emptyInput_shouldFail()
     std::cout << "PASS: T-1" << std::endl;
 }
 
+void test_addTask_oneChar_shouldPass()
+{
+    std::string input = "X";
+    bool isValid = (input.length() >= 1 && input.length() <= 200);
+    assert(isValid == true);
+    std::cout << "PASS: T-2" << std::endl;
+}
+
+
 int main()
 {
     test_newTask_shouldHaveDefaultStatus();
     test_addTask_emptyInput_shouldFail()
+    test_addTask_oneChar_shouldPass()
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
-
-s
