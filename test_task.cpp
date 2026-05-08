@@ -33,12 +33,22 @@ void test_addTask_200chars_shouldPass()
     std::cout << "PASS: PB-1.T3" << std::endl;
 }
 
+void test_addTask_201chars_shouldFail()
+{
+    std::string input(201, 'X');
+    bool isValid = (input.length() >= 1 && input.length() <= 200);
+    assert(isValid == false);
+    std::cout << "PASS: PB-1.T4" << std::endl;
+}
+
+
 int main()
 {
     test_newTask_shouldHaveDefaultStatus();
     test_addTask_emptyInput_shouldFail();
     test_addTask_oneChar_shouldPass();
     test_addTask_200chars_shouldPass();
+    test_addTask_201chars_shouldFail();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
