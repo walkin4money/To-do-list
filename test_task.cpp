@@ -41,6 +41,16 @@ void test_addTask_201chars_shouldFail()
     std::cout << "PASS: PB-1.T4" << std::endl;
 }
 
+void test_addTask_uniqueId()
+{
+    std::vector<Task> tasks;
+    addTask(tasks, "Первая задача");
+    addTask(tasks, "Вторая задача");
+    assert(tasks.size() == 2);
+    assert(tasks[0].id != tasks[1].id);
+    std::cout << "PASS: PB-1.T5" << std::endl;
+}
+
 
 int main()
 {
@@ -49,6 +59,7 @@ int main()
     test_addTask_oneChar_shouldPass();
     test_addTask_200chars_shouldPass();
     test_addTask_201chars_shouldFail();
+    test_addTask_uniqueId();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
