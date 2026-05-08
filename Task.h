@@ -6,3 +6,5 @@ struct Task {
     std::string description;
     bool isCompleted = false;
 };
+
+bool addTask(std::vector<Task>& tasks, const std::string& description);
