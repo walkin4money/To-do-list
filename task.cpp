@@ -41,3 +41,14 @@ bool deleteTask(std::vector<Task>& tasks, int id)
     std::cout << "Ошибка: задача с ID " << id << " не найдена" << std::endl;  
     return false;
 }
+
+bool toggleTaskStatus(std::vector<Task>& tasks, int id)
+{
+    for (auto& task : tasks) {
+        if (task.id == id) {
+            task.isCompleted = !task.isCompleted;
+            return true;
+        }
+    }
+    return false;
+}
