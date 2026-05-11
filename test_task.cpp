@@ -106,8 +106,6 @@ void test_showTasks_multipleTasks_shouldDisplayInOrderById()
 
     std::cout.rdbuf(old);
     std::string output = buffer.str();
-
-    // Проверяем, что ID выводятся в правильном порядке
     size_t pos1 = output.find("ID: 1");
     size_t pos2 = output.find("ID: 2");
     size_t pos3 = output.find("ID: 3");
@@ -115,10 +113,7 @@ void test_showTasks_multipleTasks_shouldDisplayInOrderById()
     assert(pos1 != std::string::npos);
     assert(pos2 != std::string::npos);
     assert(pos3 != std::string::npos);
-
-    // ID 1 должен быть раньше ID 2
     assert(pos1 < pos2);
-    // ID 2 должен быть раньше ID 3
     assert(pos2 < pos3);
 
     std::cout << "PASS: PB-2.T3" << std::endl;
@@ -135,6 +130,7 @@ int main()
     test_addTask_uniqueId();
     test_showTasks_singleTask_shouldDisplayIdAndDescription();
     test_showTasks_multipleTasks_shouldDisplayInOrderById();
+
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

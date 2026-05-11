@@ -15,6 +15,12 @@ bool addTask(std::vector<Task>& tasks, const std::string& description)
 
 void showTasks(const std::vector<Task>& tasks)
 {
+
+    if (tasks.empty()) {
+        std::cout << "Список задач пуст" << std::endl;
+        return;
+    }
+
     std::cout << "\n=== Список задач ===" << std::endl;
     for (const auto& task : tasks) {
         std::string status = task.isCompleted ? "Выполнена" : "Не выполнена";
