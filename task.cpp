@@ -28,3 +28,16 @@ void showTasks(const std::vector<Task>& tasks)
             << " | " << status << std::endl;
     }
 }
+
+bool deleteTask(std::vector<Task>& tasks, int id)
+{
+    for (auto it = tasks.begin(); it != tasks.end(); ++it) {
+        if (it->id == id) {
+            tasks.erase(it);
+            std::cout << "Задача удалена" << std::endl;
+            return true;
+        }
+    }
+    std::cout << "Ошибка: задача с ID " << id << " не найдена" << std::endl;  
+    return false;
+}

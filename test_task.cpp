@@ -137,6 +137,114 @@ void test_showTasks_emptyList_shouldShowEmptyMessage()
     std::cout << "PASS: PB-2.T1" << std::endl;
 }
 
+void test_deleteTask_existingId_shouldDeleteTask()
+{
+    std::vector<Task> tasks;
+
+    Task t1; t1.id = 1; t1.description = "Первая"; t1.isCompleted = false;
+    Task t2; t2.id = 2; t2.description = "Вторая"; t2.isCompleted = true;
+    Task t3; t3.id = 3; t3.description = "Третья"; t3.isCompleted = false;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+    tasks.push_back(t3);
+
+    assert(tasks.size() == 3);
+
+    bool result = deleteTask(tasks, 2);
+
+    assert(result == true);
+    assert(tasks.size() == 2);
+    assert(tasks[0].id == 1);
+    assert(tasks[1].id == 3);
+
+    std::cout << "PASS: PB-3.T1 - deleteTask() removes existing task" << std::endl;
+}
+
+void test_deleteTask_nonExistingId_shouldReturnFalse()
+{
+    std::vector<Task> tasks;
+
+    Task t1; t1.id = 1; t1.description = "Первая"; t1.isCompleted = false;
+    Task t2; t2.id = 2; t2.description = "Вторая"; t2.isCompleted = true;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+
+    assert(tasks.size() == 2);
+
+    bool result = deleteTask(tasks, 99);
+
+    assert(result == false);
+    assert(tasks.size() == 2);
+
+    std::cout << "PASS: PB-3.T2 - deleteTask() returns false for non-existing ID" << std::endl;
+}
+
+void test_deleteTask_idsShouldNotBeReassigned()
+{
+    std::vector<Task> tasks;
+
+    Task t1; t1.id = 1; t1.description = "Первая"; t1.isCompleted = false;
+    Task t2; t2.id = 2; t2.description = "Вторая"; t2.isCompleted = true;
+    Task t3; t3.id = 3; t3.description = "Третья"; t3.isCompleted = false;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+    tasks.push_back(t3);
+
+    deleteTask(tasks, 2);
+
+    // ID не должны переназначиться
+    assert(tasks[0].id == 1);
+    assert(tasks[1].id == 3);
+
+    std::cout << "PASS: PB-3.T3 - IDs are not reassigned after deletion" << std::endl;
+}
+
+void test_deleteTask_lastTask_shouldWork()
+{
+    std::vector<Task> tasks;
+
+    Task t1; t1.id = 1; t1.description = "Первая"; t1.isCompleted = false;
+    Task t2; t2.id = 2; t2.description = "Вторая"; t2.isCompleted = true;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+
+    assert(tasks.size() == 2);
+
+    bool result = deleteTask(tasks, 2);
+
+    assert(result == true);
+    assert(tasks.size() == 1);
+    assert(tasks[0].id == 1);
+
+    std::cout << "PASS: PB-3.T4 - deleteTask() works for last task" << std::endl;
+}
+
+void test_deleteTask_firstTask_shouldWork()
+{
+    std::vector<Task> tasks;
+
+    Task t1; t1.id = 1; t1.description = "Первая"; t1.isCompleted = false;
+    Task t2; t2.id = 2; t2.description = "Вторая"; t2.isCompleted = true;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+
+    assert(tasks.size() == 2);
+
+    bool result = deleteTask(tasks, 1);
+
+    assert(result == true);
+    assert(tasks.size() == 1);
+    assert(tasks[0].id == 2);
+
+    std::cout << "PASS: PB-3.T5 - deleteTask() works for first task" << std::endl;
+}
+
+
 int main()
 {
    
@@ -149,6 +257,11 @@ int main()
     test_showTasks_singleTask_shouldDisplayIdAndDescription();
     test_showTasks_multipleTasks_shouldDisplayInOrderById();
     test_showTasks_emptyList_shouldShowEmptyMessage();
+    test_deleteTask_existingId_shouldDeleteTask();
+    test_deleteTask_nonExistingId_shouldReturnFalse();
+    test_deleteTask_idsShouldNotBeReassigned();
+    test_deleteTask_lastTask_shouldWork();
+    test_deleteTask_firstTask_shouldWork();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
