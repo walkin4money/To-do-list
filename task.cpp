@@ -11,3 +11,14 @@ bool addTask(std::vector<Task>& tasks, const std::string& description)
     tasks.push_back(t);
     return true;
 }
+
+void showTasks(const std::vector<Task>& tasks)
+{
+    std::cout << "\n=== Список задач ===" << std::endl;
+    for (const auto& task : tasks) {
+        std::string status = task.isCompleted ? "Выполнена" : "Не выполнена";
+        std::cout << "ID: " << task.id
+            << " | " << task.description
+            << " | " << status << std::endl;
+    }
+}
