@@ -340,6 +340,40 @@ void test_toggleStatus_toggleTwice_shouldReturnToOriginal()
     std::cout << "PASS: PB-4.T5 - toggleTaskStatus() toggles back to original on second call" << std::endl;
 }
 
+void test_toggleStatus_nonExistingTask_shouldShowErrorMessage()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+
+    // Перенаправляем вывод в строку
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    // Пытаемся изменить статус несуществующей задачи
+    bool result = toggleTaskStatus(tasks, 99);
+
+    // Восстанавливаем вывод
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    // Проверяем, что функция вернула false
+    assert(result == false);
+
+    // Проверяем, что статус задачи не изменился
+    assert(tasks[0].isCompleted == false);
+
+    // Проверяем, что выведено сообщение об ошибке
+    assert(output.find("Ошибка: задача с ID 99 не найдена") != std::string::npos);
+
+    std::cout << "PASS: PB-4.T3 - toggleTaskStatus() shows error message for non-existing ID" << std::endl;
+}
+
+
 
 int main()
 {
@@ -365,6 +399,7 @@ int main()
     test_toggleStatus_existingTask_completedToNotCompleted();
     test_toggleStatus_otherTasksStatusShouldNotChange();
     test_toggleStatus_toggleTwice_shouldReturnToOriginal();
+    test_toggleStatus_nonExistingTask_shouldShowErrorMessage();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
