@@ -41,3 +41,16 @@ bool deleteTask(std::vector<Task>& tasks, int id)
     std::cout << "Îøèáêà: çàäà÷à ñ ID " << id << " íå íàéäåíà" << std::endl;  
     return false;
 }
+
+bool toggleTaskStatus(std::vector<Task>& tasks, int id)
+{
+    for (auto& task : tasks) {
+        if (task.id == id) {
+            task.isCompleted = !task.isCompleted;
+            std::cout << "Ñòàòóñ çàäà÷è " << id << " èçìåí¸í" << std::endl;  // ÍÎÂÎÅ ÑÎÎÁÙÅÍÈÅ
+            return true;
+        }
+    }
+    std::cout << "Îøèáêà: çàäà÷à ñ ID " << id << " íå íàéäåíà" << std::endl;  // ÍÎÂÎÅ ÑÎÎÁÙÅÍÈÅ
+    return false;
+}

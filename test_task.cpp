@@ -244,10 +244,143 @@ void test_deleteTask_firstTask_shouldWork()
     std::cout << "PASS: PB-3.T5 - deleteTask() works for first task" << std::endl;
 }
 
+void test_toggleStatus_existingTask_notCompletedToCompleted()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+    assert(tasks[0].isCompleted == false);
+
+    bool result = toggleTaskStatus(tasks, 1);
+
+    assert(result == true);
+    assert(tasks[0].isCompleted == true);
+
+    std::cout << "PASS: PB-4.T1 - toggleTaskStatus() changes not completed to completed" << std::endl;
+}
+
+void test_toggleStatus_existingTask_completedToNotCompleted()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = true;
+    tasks.push_back(t1);
+
+    // Проверяем начальный статус
+    assert(tasks[0].isCompleted == true);
+
+    // Меняем статус
+    bool result = toggleTaskStatus(tasks, 1);
+
+    // Проверяем результат
+    assert(result == true);
+    assert(tasks[0].isCompleted == false);
+
+    std::cout << "PASS: PB-4.T2 - toggleTaskStatus() changes completed to not completed" << std::endl;
+}
+
+void test_toggleStatus_otherTasksStatusShouldNotChange()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = false;
+
+    Task t2;
+    t2.id = 2;
+    t2.description = "Вторая задача";
+    t2.isCompleted = true;
+
+    Task t3;
+    t3.id = 3;
+    t3.description = "Третья задача";
+    t3.isCompleted = false;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+    tasks.push_back(t3);
+
+    // Меняем статус только у задачи с ID = 2
+    toggleTaskStatus(tasks, 2);
+
+    // Проверяем, что статус других задач не изменился
+    assert(tasks[0].isCompleted == false);
+    assert(tasks[1].isCompleted == false);  // Изменился с true на false
+    assert(tasks[2].isCompleted == false);
+
+    std::cout << "PASS: PB-4.T4 - other tasks status not changed" << std::endl;
+}
+void test_toggleStatus_toggleTwice_shouldReturnToOriginal()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+
+    // Первое изменение
+    toggleTaskStatus(tasks, 1);
+    assert(tasks[0].isCompleted == true);
+
+    // Второе изменение (обратно)
+    toggleTaskStatus(tasks, 1);
+    assert(tasks[0].isCompleted == false);
+
+    std::cout << "PASS: PB-4.T5 - toggleTaskStatus() toggles back to original on second call" << std::endl;
+}
+
+void test_toggleStatus_nonExistingTask_shouldShowErrorMessage()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+
+    // Перенаправляем вывод в строку
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    // Пытаемся изменить статус несуществующей задачи
+    bool result = toggleTaskStatus(tasks, 99);
+
+    // Восстанавливаем вывод
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    // Проверяем, что функция вернула false
+    assert(result == false);
+
+    // Проверяем, что статус задачи не изменился
+    assert(tasks[0].isCompleted == false);
+
+    // Проверяем, что выведено сообщение об ошибке
+    assert(output.find("Ошибка: задача с ID 99 не найдена") != std::string::npos);
+
+    std::cout << "PASS: PB-4.T3 - toggleTaskStatus() shows error message for non-existing ID" << std::endl;
+}
+
+
 
 int main()
 {
-   
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+
     test_newTask_shouldHaveDefaultStatus();
     test_addTask_emptyInput_shouldFail();
     test_addTask_oneChar_shouldPass();
@@ -262,6 +395,11 @@ int main()
     test_deleteTask_idsShouldNotBeReassigned();
     test_deleteTask_lastTask_shouldWork();
     test_deleteTask_firstTask_shouldWork();
+    test_toggleStatus_existingTask_notCompletedToCompleted();
+    test_toggleStatus_existingTask_completedToNotCompleted();
+    test_toggleStatus_otherTasksStatusShouldNotChange();
+    test_toggleStatus_toggleTwice_shouldReturnToOriginal();
+    test_toggleStatus_nonExistingTask_shouldShowErrorMessage();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
