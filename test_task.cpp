@@ -2,6 +2,8 @@
 #include "Task.h"
 #include <cassert>
 #include <iostream>
+#include <string>
+#include <sstream>
 
 void test_newTask_shouldHaveDefaultStatus()
 {
@@ -51,6 +53,30 @@ void test_addTask_uniqueId()
     std::cout << "PASS: PB-1.T5" << std::endl;
 }
 
+void test_showTasks_singleTask_shouldDisplayIdAndDescription()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Купить хлеб";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    showTasks(tasks);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    assert(output.find("ID: 1") != std::string::npos);
+    assert(output.find("Купить хлеб") != std::string::npos);
+    std::cout << "PASS: PB-2.T2" << std::endl;
+}
+
+
 
 int main()
 {
@@ -60,6 +86,7 @@ int main()
     test_addTask_200chars_shouldPass();
     test_addTask_201chars_shouldFail();
     test_addTask_uniqueId();
+    test_showTasks_singleTask_shouldDisplayIdAndDescription();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
