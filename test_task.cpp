@@ -263,6 +263,29 @@ void test_toggleStatus_existingTask_notCompletedToCompleted()
     std::cout << "PASS: PB-4.T1 - toggleTaskStatus() changes not completed to completed" << std::endl;
 }
 
+void test_toggleStatus_existingTask_completedToNotCompleted()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = true;
+    tasks.push_back(t1);
+
+    // Проверяем начальный статус
+    assert(tasks[0].isCompleted == true);
+
+    // Меняем статус
+    bool result = toggleTaskStatus(tasks, 1);
+
+    // Проверяем результат
+    assert(result == true);
+    assert(tasks[0].isCompleted == false);
+
+    std::cout << "PASS: PB-4.T2 - toggleTaskStatus() changes completed to not completed" << std::endl;
+}
+
 
 int main()
 {
@@ -285,6 +308,7 @@ int main()
     test_deleteTask_lastTask_shouldWork();
     test_deleteTask_firstTask_shouldWork();
     test_toggleStatus_existingTask_notCompletedToCompleted();
+    test_toggleStatus_existingTask_completedToNotCompleted();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
