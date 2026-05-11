@@ -244,10 +244,32 @@ void test_deleteTask_firstTask_shouldWork()
     std::cout << "PASS: PB-3.T5 - deleteTask() works for first task" << std::endl;
 }
 
+void test_toggleStatus_existingTask_notCompletedToCompleted()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+    assert(tasks[0].isCompleted == false);
+
+    bool result = toggleTaskStatus(tasks, 1);
+
+    assert(result == true);
+    assert(tasks[0].isCompleted == true);
+
+    std::cout << "PASS: PB-4.T1 - toggleTaskStatus() changes not completed to completed" << std::endl;
+}
+
 
 int main()
 {
-   
+    SetConsoleCP(1251);
+    SetConsoleOutputCP(1251);
+
+
     test_newTask_shouldHaveDefaultStatus();
     test_addTask_emptyInput_shouldFail();
     test_addTask_oneChar_shouldPass();
@@ -262,6 +284,7 @@ int main()
     test_deleteTask_idsShouldNotBeReassigned();
     test_deleteTask_lastTask_shouldWork();
     test_deleteTask_firstTask_shouldWork();
+    test_toggleStatus_existingTask_notCompletedToCompleted();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
