@@ -34,10 +34,10 @@ bool deleteTask(std::vector<Task>& tasks, int id)
     for (auto it = tasks.begin(); it != tasks.end(); ++it) {
         if (it->id == id) {
             tasks.erase(it);
-            std::cout << "Çàäà÷à óäàëåíà" << std::endl;  // ÍÎÂÎÅ ÑÎÎÁÙÅÍÈÅ
+            std::cout << "Çàäà÷à óäàëåíà" << std::endl;
             return true;
         }
     }
-    std::cout << "Îøèáêà: çàäà÷à ñ ID " << id << " íå íàéäåíà" << std::endl;  // ÍÎÂÎÅ ÑÎÎÁÙÅÍÈÅ
+    std::cout << "Îøèáêà: çàäà÷à ñ ID " << id << " íå íàéäåíà" << std::endl;  
     return false;
 }
