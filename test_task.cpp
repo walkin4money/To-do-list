@@ -4,6 +4,8 @@
 #include <iostream>
 #include <string>
 #include <sstream>
+#include <windows.h>
+
 
 void test_newTask_shouldHaveDefaultStatus()
 {
@@ -119,9 +121,25 @@ void test_showTasks_multipleTasks_shouldDisplayInOrderById()
     std::cout << "PASS: PB-2.T3" << std::endl;
 }
 
+void test_showTasks_emptyList_shouldShowEmptyMessage()
+{
+    std::vector<Task> tasks;
+
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    showTasks(tasks);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    assert(output.find("Список задач пуст") != std::string::npos);
+    std::cout << "PASS: PB-2.T1" << std::endl;
+}
 
 int main()
 {
+   
     test_newTask_shouldHaveDefaultStatus();
     test_addTask_emptyInput_shouldFail();
     test_addTask_oneChar_shouldPass();
@@ -130,7 +148,7 @@ int main()
     test_addTask_uniqueId();
     test_showTasks_singleTask_shouldDisplayIdAndDescription();
     test_showTasks_multipleTasks_shouldDisplayInOrderById();
-
+    test_showTasks_emptyList_shouldShowEmptyMessage();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

@@ -15,15 +15,14 @@ bool addTask(std::vector<Task>& tasks, const std::string& description)
 
 void showTasks(const std::vector<Task>& tasks)
 {
-
     if (tasks.empty()) {
-        std::cout << "Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð·Ð°Ð´Ð°Ñ‡ Ð¿ÑƒÑÑ‚" << std::endl;
+        std::cout << "Ñïèñîê çàäà÷ ïóñò" << std::endl;
         return;
     }
 
-    std::cout << "\n=== Ð¡Ð¿Ð¸ÑÐ¾Ðº Ð·Ð°Ð´Ð°Ñ‡ ===" << std::endl;
+    std::cout << "\n=== Ñïèñîê çàäà÷ ===" << std::endl;
     for (const auto& task : tasks) {
-        std::string status = task.isCompleted ? "Ð’Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð°" : "ÐÐµ Ð²Ñ‹Ð¿Ð¾Ð»Ð½ÐµÐ½Ð°";
+        std::string status = task.isCompleted ? "Âûïîëíåíà" : "Íå âûïîëíåíà";
         std::cout << "ID: " << task.id
             << " | " << task.description
             << " | " << status << std::endl;
