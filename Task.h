@@ -10,3 +10,4 @@ struct Task {
 };
 
 bool addTask(std::vector<Task>& tasks, const std::string& description);
+void showTasks(const std::vector<Task>& tasks); 

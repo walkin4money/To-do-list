@@ -1,4 +1,5 @@
 #include "Task.h"
+#include <iostream> 
 
 bool addTask(std::vector<Task>& tasks, const std::string& description)
 {
@@ -10,4 +11,20 @@ bool addTask(std::vector<Task>& tasks, const std::string& description)
     t.description = description;
     tasks.push_back(t);
     return true;
+}
+
+void showTasks(const std::vector<Task>& tasks)
+{
+    if (tasks.empty()) {
+        std::cout << "Список задач пуст" << std::endl;
+        return;
+    }
+
+    std::cout << "\n=== Список задач ===" << std::endl;
+    for (const auto& task : tasks) {
+        std::string status = task.isCompleted ? "Выполнена" : "Не выполнена";
+        std::cout << "ID: " << task.id
+            << " | " << task.description
+            << " | " << status << std::endl;
+    }
 }

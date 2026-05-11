@@ -1,4 +1,4 @@
-ï»¿#include <iostream>
+#include <iostream>
 #include <vector>
 #include <windows.h>
 #include "Task.h"
@@ -13,14 +13,15 @@ int main()
 
     do {
         std::cout << "\n===== TODO List =====" << std::endl;
-        std::cout << "1. Ð”Ð¾Ð±Ð°Ð²Ð¸Ñ‚ÑŒ Ð·Ð°Ð´Ð°Ñ‡Ñƒ" << std::endl;
-        std::cout << "0. Ð’Ñ‹Ñ…Ð¾Ð´" << std::endl;
-        std::cout << "Ð’Ñ‹Ð±Ð¾Ñ€: ";
+        std::cout << "1. Äîáàâèòü çàäà÷ó" << std::endl;
+        std::cout << "2. Ïîêàçàòü âñå çàäà÷è" << std::endl;  // ÍÎÂÛÉ ÏÓÍÊÒ
+        std::cout << "0. Âûõîä" << std::endl;
+        std::cout << "Âûáîð: ";
 
         if (!(std::cin >> choice)) {
             std::cin.clear();
             std::cin.ignore(10000, '\n');
-            std::cout << "ÐžÑˆÐ¸Ð±ÐºÐ°: Ð²Ð²ÐµÐ´Ð¸Ñ‚Ðµ Ñ‡Ð¸ÑÐ»Ð¾" << std::endl;
+            std::cout << "Îøèáêà: ââåäèòå ÷èñëî" << std::endl;
             choice = -1;
         }
         else {
@@ -29,15 +30,21 @@ int main()
 
         if (choice == 1) {
             std::string desc;
-            std::cout << "ÐžÐ¿Ð¸ÑÐ°Ð½Ð¸Ðµ: ";
+            std::cout << "Îïèñàíèå: ";
             std::getline(std::cin, desc);
 
             if (addTask(tasks, desc)) {
-                std::cout << "Ð—Ð°Ð´Ð°Ñ‡Ð° Ð´Ð¾Ð±Ð°Ð²Ð»ÐµÐ½Ð° (ID: " << tasks.back().id << ")" << std::endl;
+                std::cout << "Çàäà÷à äîáàâëåíà (ID: " << tasks.back().id << ")" << std::endl;
             }
             else {
-                std::cout << "ÐžÑˆÐ¸Ð±ÐºÐ°: Ð¾Ð¿Ð¸ÑÐ°Ð½Ð¸Ðµ Ð½Ðµ Ð¼Ð¾Ð¶ÐµÑ‚ Ð±Ñ‹Ñ‚ÑŒ Ð¿ÑƒÑÑ‚Ñ‹Ð¼" << std::endl;
+                std::cout << "Îøèáêà: îïèñàíèå íå ìîæåò áûòü ïóñòûì" << std::endl;
             }
+        }
+        else if (choice == 2) {           // ÍÎÂÛÉ ÁËÎÊ
+            showTasks(tasks);
+            std::cout << "\nÍàæìèòå Enter äëÿ ïðîäîëæåíèÿ...";
+            std::cin.ignore(10000, '\n');
+            std::cin.get();
         }
     } while (choice != 0);
 
