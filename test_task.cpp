@@ -479,6 +479,53 @@ void test_saveToFile_multipleTasks_shouldSaveAll()
     std::cout << "PASS: PB-6.T3 - saveToFile() saves multiple tasks correctly" << std::endl;
 }
 
+void test_saveToFile_statusEncoding_shouldBeZeroOrOne()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Не выполнена";
+    t1.isCompleted = false;
+
+    Task t2;
+    t2.id = 2;
+    t2.description = "Выполнена";
+    t2.isCompleted = true;
+
+    Task t3;
+    t3.id = 3;
+    t3.description = "Снова не выполнена";
+    t3.isCompleted = false;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+    tasks.push_back(t3);
+
+    std::string testFile = "test_status.csv";
+
+    saveToFile(tasks, testFile);
+
+    std::ifstream file(testFile);
+    std::string line;
+
+    // Первая задача: статус 0
+    std::getline(file, line);
+    assert(line.find(";0") != std::string::npos || line.back() == '0');
+
+    // Вторая задача: статус 1
+    std::getline(file, line);
+    assert(line.find(";1") != std::string::npos || line.back() == '1');
+
+    // Третья задача: статус 0
+    std::getline(file, line);
+    assert(line.find(";0") != std::string::npos || line.back() == '0');
+
+    file.close();
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T4 - saveToFile() encodes status as 0 and 1" << std::endl;
+}
 
 
 int main()
@@ -509,6 +556,7 @@ int main()
     test_saveToFile_emptyList_shouldCreateEmptyFile();
     test_saveToFile_singleTask_shouldSaveCorrectly();
     test_saveToFile_multipleTasks_shouldSaveAll();
+    test_saveToFile_statusEncoding_shouldBeZeroOrOne();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
