@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <windows.h>
-
+#include <fstream>
 
 void test_newTask_shouldHaveDefaultStatus()
 {
@@ -373,6 +373,202 @@ void test_toggleStatus_nonExistingTask_shouldShowErrorMessage()
     std::cout << "PASS: PB-4.T3 - toggleTaskStatus() shows error message for non-existing ID" << std::endl;
 }
 
+void test_saveToFile_emptyList_shouldCreateEmptyFile()
+{
+    std::vector<Task> tasks;
+
+    std::string testFile = "test_empty.csv";
+
+    bool result = saveToFile(tasks, testFile);
+
+    assert(result == true);
+
+    // Проверяем, что файл существует
+    std::ifstream file(testFile);
+    assert(file.good());
+
+    // Проверяем, что файл пустой или содержит только заголовок?
+    file.seekg(0, std::ios::end);
+    std::streampos size = file.tellg();
+    // Файл может быть пустым или содержать пустые строки
+
+    file.close();
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T1 - saveToFile() handles empty list" << std::endl;
+}
+
+void test_saveToFile_singleTask_shouldSaveCorrectly()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Купить хлеб";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+
+    std::string testFile = "test_single.csv";
+
+    bool result = saveToFile(tasks, testFile);
+
+    assert(result == true);
+
+    // Проверяем содержимое файла
+    std::ifstream file(testFile);
+    std::string line;
+    std::getline(file, line);
+
+    // Ожидаемый формат: id;description;status
+    assert(line == "1;Купить хлеб;0");
+
+    file.close();
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T2 - saveToFile() saves single task correctly" << std::endl;
+}
+void test_saveToFile_multipleTasks_shouldSaveAll()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = false;
+
+    Task t2;
+    t2.id = 2;
+    t2.description = "Вторая задача";
+    t2.isCompleted = true;
+
+    Task t3;
+    t3.id = 3;
+    t3.description = "Третья задача";
+    t3.isCompleted = false;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+    tasks.push_back(t3);
+
+    std::string testFile = "test_multiple.csv";
+
+    bool result = saveToFile(tasks, testFile);
+
+    assert(result == true);
+
+    // Проверяем содержимое файла
+    std::ifstream file(testFile);
+    std::string line;
+
+    std::getline(file, line);
+    assert(line == "1;Первая задача;0");
+
+    std::getline(file, line);
+    assert(line == "2;Вторая задача;1");
+
+    std::getline(file, line);
+    assert(line == "3;Третья задача;0");
+
+    // Проверяем, что нет лишних строк
+    std::getline(file, line);
+    assert(file.eof());
+
+    file.close();
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T3 - saveToFile() saves multiple tasks correctly" << std::endl;
+}
+
+void test_saveToFile_statusEncoding_shouldBeZeroOrOne()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Не выполнена";
+    t1.isCompleted = false;
+
+    Task t2;
+    t2.id = 2;
+    t2.description = "Выполнена";
+    t2.isCompleted = true;
+
+    Task t3;
+    t3.id = 3;
+    t3.description = "Снова не выполнена";
+    t3.isCompleted = false;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+    tasks.push_back(t3);
+
+    std::string testFile = "test_status.csv";
+
+    saveToFile(tasks, testFile);
+
+    std::ifstream file(testFile);
+    std::string line;
+
+    // Первая задача: статус 0
+    std::getline(file, line);
+    assert(line.find(";0") != std::string::npos || line.back() == '0');
+
+    // Вторая задача: статус 1
+    std::getline(file, line);
+    assert(line.find(";1") != std::string::npos || line.back() == '1');
+
+    // Третья задача: статус 0
+    std::getline(file, line);
+    assert(line.find(";0") != std::string::npos || line.back() == '0');
+
+    file.close();
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T4 - saveToFile() encodes status as 0 and 1" << std::endl;
+}
+
+void test_saveToFile_writeError_shouldShowErrorMessage()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Тестовая задача";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+
+    // Создаём файл и делаем его read-only
+    std::string testFile = "test_readonly.csv";
+
+    // Сначала создаём файл
+    std::ofstream dummy(testFile);
+    dummy.close();
+
+    // Делаем файл только для чтения (Windows)
+    SetFileAttributesA(testFile.c_str(), FILE_ATTRIBUTE_READONLY);
+
+    // Перенаправляем вывод
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    bool result = saveToFile(tasks, testFile);
+
+    // Восстанавливаем вывод
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    // Проверяем, что функция вернула false
+    assert(result == false);
+
+    // Проверяем, что выведено сообщение об ошибке
+    assert(output.find("Ошибка сохранения данных") != std::string::npos);
+
+    // Убираем read-only атрибут и удаляем файл
+    SetFileAttributesA(testFile.c_str(), FILE_ATTRIBUTE_NORMAL);
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T6 - saveToFile() shows error message on write failure" << std::endl;
+}
 
 
 int main()
@@ -400,6 +596,11 @@ int main()
     test_toggleStatus_otherTasksStatusShouldNotChange();
     test_toggleStatus_toggleTwice_shouldReturnToOriginal();
     test_toggleStatus_nonExistingTask_shouldShowErrorMessage();
+    test_saveToFile_emptyList_shouldCreateEmptyFile();
+    test_saveToFile_singleTask_shouldSaveCorrectly();
+    test_saveToFile_multipleTasks_shouldSaveAll();
+    test_saveToFile_statusEncoding_shouldBeZeroOrOne();
+    test_saveToFile_writeError_shouldShowErrorMessage();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

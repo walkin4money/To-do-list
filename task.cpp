@@ -1,5 +1,6 @@
 #include "Task.h"
 #include <iostream> 
+#include <fstream>
 
 bool addTask(std::vector<Task>& tasks, const std::string& description)
 {
@@ -53,4 +54,29 @@ bool toggleTaskStatus(std::vector<Task>& tasks, int id)
     }
     std::cout << "Ошибка: задача с ID " << id << " не найдена" << std::endl;  // НОВОЕ СООБЩЕНИЕ
     return false;
+}
+
+bool saveToFile(const std::vector<Task>& tasks, const std::string& filename)
+{
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cout << "Ошибка сохранения данных" << std::endl;
+        return false;
+    }
+
+    for (const auto& task : tasks) {
+        file << task.id << ";"
+            << task.description << ";"
+            << (task.isCompleted ? 1 : 0) << std::endl;
+
+        // Проверяем ошибку записи
+        if (file.fail()) {
+            std::cout << "Ошибка сохранения данных" << std::endl;
+            file.close();
+            return false;
+        }
+    }
+
+    file.close();
+    return true;
 }

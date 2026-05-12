@@ -13,3 +13,4 @@ bool addTask(std::vector<Task>& tasks, const std::string& description);
 void showTasks(const std::vector<Task>& tasks); 
 bool deleteTask(std::vector<Task>& tasks, int id);
 bool toggleTaskStatus(std::vector<Task>& tasks, int id);
+bool saveToFile(const std::vector<Task>& tasks, const std::string& filename);
