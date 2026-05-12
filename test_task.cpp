@@ -427,6 +427,57 @@ void test_saveToFile_singleTask_shouldSaveCorrectly()
 
     std::cout << "PASS: PB-6.T2 - saveToFile() saves single task correctly" << std::endl;
 }
+void test_saveToFile_multipleTasks_shouldSaveAll()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Первая задача";
+    t1.isCompleted = false;
+
+    Task t2;
+    t2.id = 2;
+    t2.description = "Вторая задача";
+    t2.isCompleted = true;
+
+    Task t3;
+    t3.id = 3;
+    t3.description = "Третья задача";
+    t3.isCompleted = false;
+
+    tasks.push_back(t1);
+    tasks.push_back(t2);
+    tasks.push_back(t3);
+
+    std::string testFile = "test_multiple.csv";
+
+    bool result = saveToFile(tasks, testFile);
+
+    assert(result == true);
+
+    // Проверяем содержимое файла
+    std::ifstream file(testFile);
+    std::string line;
+
+    std::getline(file, line);
+    assert(line == "1;Первая задача;0");
+
+    std::getline(file, line);
+    assert(line == "2;Вторая задача;1");
+
+    std::getline(file, line);
+    assert(line == "3;Третья задача;0");
+
+    // Проверяем, что нет лишних строк
+    std::getline(file, line);
+    assert(file.eof());
+
+    file.close();
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T3 - saveToFile() saves multiple tasks correctly" << std::endl;
+}
 
 
 
@@ -457,6 +508,7 @@ int main()
     test_toggleStatus_nonExistingTask_shouldShowErrorMessage();
     test_saveToFile_emptyList_shouldCreateEmptyFile();
     test_saveToFile_singleTask_shouldSaveCorrectly();
+    test_saveToFile_multipleTasks_shouldSaveAll();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
