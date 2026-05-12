@@ -636,6 +636,24 @@ void test_loadFromFile_statusEncoding_shouldLoadCorrectly()
     std::cout << "PASS: PB-7.T4 - loadFromFile() loads status correctly (0 and 1)" << std::endl;
 }
 
+void test_loadFromFile_noFile_shouldReturnEmptyList()
+{
+    std::string testFile = "test_non_existent.csv";
+
+    // Убеждаемся, что файла нет
+    std::remove(testFile.c_str());
+
+    std::vector<Task> tasks;
+    tasks.push_back(Task()); // Добавляем что-то, чтобы проверить что очищается
+
+    bool result = loadFromFile(tasks, testFile);
+
+    assert(result == true);
+    assert(tasks.empty());
+
+    std::cout << "PASS: PB-7.T1 - loadFromFile() handles missing file" << std::endl;
+}
+
 int main()
 {
     SetConsoleCP(1251);
@@ -669,6 +687,7 @@ int main()
     test_loadFromFile_singleTask_shouldLoadCorrectly();
     test_loadFromFile_multipleTasks_shouldLoadAll();
     test_loadFromFile_statusEncoding_shouldLoadCorrectly();
+    test_loadFromFile_noFile_shouldReturnEmptyList();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

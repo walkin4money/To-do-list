@@ -89,6 +89,7 @@ bool loadFromFile(std::vector<Task>& tasks, const std::string& filename)
 
     // AC4: Если файла нет — пустой список
     if (!file.is_open()) {
+        tasks.clear();
         return true;  // Не ошибка, просто файла нет
     }
 
