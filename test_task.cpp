@@ -760,6 +760,30 @@ void test_loadFromFile_invalidStatus_shouldShowErrorAndClearList()
 
     std::cout << "PASS: PB-7.T7 - loadFromFile() handles invalid status (not 0 or 1)" << std::endl;
 }
+void test_loadFromFile_descriptionWithSemicolon_shouldLoadCorrectly()
+{
+    std::string testFile = "test_semicolon.csv";
+    std::ofstream file(testFile);
+    file << "1;Описание с;0";  // Описание с разделителем
+    file.close();
+
+    std::vector<Task> tasks;
+
+    bool result = loadFromFile(tasks, testFile);
+
+    // При использовании getline с разделителем ';'
+    // описание обрежется до первого ";"
+    assert(result == true);
+    assert(tasks.size() == 1);
+    assert(tasks[0].id == 1);
+    assert(tasks[0].description == "Описание с");  // Обрезано на ";"
+    assert(tasks[0].isCompleted == false);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T8 - loadFromFile() handles semicolon in description" << std::endl;
+}
+
 
 int main()
 {
@@ -798,6 +822,7 @@ int main()
     test_loadFromFile_corruptedFile_shouldShowErrorAndClearList();
     test_loadFromFile_invalidId_shouldShowErrorAndClearList();
     test_loadFromFile_invalidStatus_shouldShowErrorAndClearList();
+    test_loadFromFile_descriptionWithSemicolon_shouldLoadCorrectly();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
