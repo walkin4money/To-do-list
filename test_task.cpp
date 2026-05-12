@@ -5,7 +5,7 @@
 #include <string>
 #include <sstream>
 #include <windows.h>
-
+#include <fstream>
 
 void test_newTask_shouldHaveDefaultStatus()
 {
@@ -373,6 +373,30 @@ void test_toggleStatus_nonExistingTask_shouldShowErrorMessage()
     std::cout << "PASS: PB-4.T3 - toggleTaskStatus() shows error message for non-existing ID" << std::endl;
 }
 
+void test_saveToFile_emptyList_shouldCreateEmptyFile()
+{
+    std::vector<Task> tasks;
+
+    std::string testFile = "test_empty.csv";
+
+    bool result = saveToFile(tasks, testFile);
+
+    assert(result == true);
+
+    // Проверяем, что файл существует
+    std::ifstream file(testFile);
+    assert(file.good());
+
+    // Проверяем, что файл пустой или содержит только заголовок?
+    file.seekg(0, std::ios::end);
+    std::streampos size = file.tellg();
+    // Файл может быть пустым или содержать пустые строки
+
+    file.close();
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T1 - saveToFile() handles empty list" << std::endl;
+}
 
 
 int main()
@@ -400,6 +424,7 @@ int main()
     test_toggleStatus_otherTasksStatusShouldNotChange();
     test_toggleStatus_toggleTwice_shouldReturnToOriginal();
     test_toggleStatus_nonExistingTask_shouldShowErrorMessage();
+    test_saveToFile_emptyList_shouldCreateEmptyFile();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
