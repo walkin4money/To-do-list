@@ -653,7 +653,37 @@ void test_loadFromFile_noFile_shouldReturnEmptyList()
 
     std::cout << "PASS: PB-7.T1 - loadFromFile() handles missing file" << std::endl;
 }
+void test_loadFromFile_corruptedFile_shouldShowErrorAndClearList()
+{
+    std::string testFile = "test_corrupted.csv";
+    std::ofstream file(testFile);
+    file << "1;Первая;0\n";
+    file << "это не csv строка\n";
+    file << "3;Третья;1";
+    file.close();
 
+    std::vector<Task> tasks;
+    Task existingTask;
+    existingTask.id = 99;
+    tasks.push_back(existingTask);
+
+    // Перенаправляем вывод
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    bool result = loadFromFile(tasks, testFile);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    assert(result == false);
+    assert(tasks.empty());
+    assert(output.find("Ошибка загрузки") != std::string::npos);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T5 - loadFromFile() handles corrupted file" << std::endl;
+}
 int main()
 {
     SetConsoleCP(1251);
@@ -688,6 +718,7 @@ int main()
     test_loadFromFile_multipleTasks_shouldLoadAll();
     test_loadFromFile_statusEncoding_shouldLoadCorrectly();
     test_loadFromFile_noFile_shouldReturnEmptyList();
+    test_loadFromFile_corruptedFile_shouldShowErrorAndClearList();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
