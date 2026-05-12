@@ -1,7 +1,41 @@
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <sstream>
 #include <windows.h>
 #include "Task.h"
+
+const std::string DATA_FILE = "tasks.csv";  // Имя файла для сохранения
+
+void loadFromFile(std::vector<Task>& tasks, const std::string& filename)
+{
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        return;  // Файла нет — пустой список
+    }
+
+    tasks.clear();
+    std::string line;
+
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
+
+        std::stringstream ss(line);
+        std::string idStr, description, statusStr;
+
+        std::getline(ss, idStr, ';');
+        std::getline(ss, description, ';');
+        std::getline(ss, statusStr, ';');
+
+        Task t;
+        t.id = std::stoi(idStr);
+        t.description = description;
+        t.isCompleted = (std::stoi(statusStr) == 1);
+        tasks.push_back(t);
+    }
+
+    file.close();
+}
 
 int main()
 {
@@ -9,6 +43,10 @@ int main()
     SetConsoleOutputCP(1251);
 
     std::vector<Task> tasks;
+
+    // Загружаем задачи при старте
+    loadFromFile(tasks, DATA_FILE);
+
     int choice;
 
     do {
@@ -16,7 +54,7 @@ int main()
         std::cout << "1. Добавить задачу" << std::endl;
         std::cout << "2. Показать все задачи" << std::endl;
         std::cout << "3. Удалить задачу" << std::endl;
-        std::cout << "4. Изменить статус задачи" << std::endl;  // НОВЫЙ ПУНКТ
+        std::cout << "4. Изменить статус задачи" << std::endl;
         std::cout << "0. Выход" << std::endl;
         std::cout << "Выбор: ";
 
@@ -37,6 +75,7 @@ int main()
 
             if (addTask(tasks, desc)) {
                 std::cout << "Задача добавлена (ID: " << tasks.back().id << ")" << std::endl;
+                saveToFile(tasks, DATA_FILE);
             }
             else {
                 std::cout << "Ошибка: описание не может быть пустым" << std::endl;
@@ -59,13 +98,14 @@ int main()
             }
             else {
                 deleteTask(tasks, id);
+                saveToFile(tasks, DATA_FILE);
             }
 
             std::cout << "\nНажмите Enter для продолжения...";
             std::cin.ignore(10000, '\n');
             std::cin.get();
         }
-        else if (choice == 4) {  // НОВЫЙ БЛОК
+        else if (choice == 4) {
             int id;
             std::cout << "Введите ID задачи для изменения статуса: ";
 
@@ -76,6 +116,7 @@ int main()
             }
             else {
                 toggleTaskStatus(tasks, id);
+                saveToFile(tasks, DATA_FILE);
             }
 
             std::cout << "\nНажмите Enter для продолжения...";
@@ -83,6 +124,9 @@ int main()
             std::cin.get();
         }
     } while (choice != 0);
+
+    // Сохраняем перед выходом
+    saveToFile(tasks, DATA_FILE);
 
     return 0;
 }
