@@ -398,6 +398,37 @@ void test_saveToFile_emptyList_shouldCreateEmptyFile()
     std::cout << "PASS: PB-6.T1 - saveToFile() handles empty list" << std::endl;
 }
 
+void test_saveToFile_singleTask_shouldSaveCorrectly()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Купить хлеб";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+
+    std::string testFile = "test_single.csv";
+
+    bool result = saveToFile(tasks, testFile);
+
+    assert(result == true);
+
+    // Проверяем содержимое файла
+    std::ifstream file(testFile);
+    std::string line;
+    std::getline(file, line);
+
+    // Ожидаемый формат: id;description;status
+    assert(line == "1;Купить хлеб;0");
+
+    file.close();
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T2 - saveToFile() saves single task correctly" << std::endl;
+}
+
+
 
 int main()
 {
@@ -425,6 +456,7 @@ int main()
     test_toggleStatus_toggleTwice_shouldReturnToOriginal();
     test_toggleStatus_nonExistingTask_shouldShowErrorMessage();
     test_saveToFile_emptyList_shouldCreateEmptyFile();
+    test_saveToFile_singleTask_shouldSaveCorrectly();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
