@@ -684,6 +684,35 @@ void test_loadFromFile_corruptedFile_shouldShowErrorAndClearList()
 
     std::cout << "PASS: PB-7.T5 - loadFromFile() handles corrupted file" << std::endl;
 }
+
+void test_loadFromFile_invalidId_shouldShowErrorAndClearList()
+{
+    std::string testFile = "test_invalid_id.csv";
+    std::ofstream file(testFile);
+    file << "abc;Первая;0";  // ID не число
+    file.close();
+
+    std::vector<Task> tasks;
+    tasks.push_back(Task());
+
+    // Перенаправляем вывод
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    bool result = loadFromFile(tasks, testFile);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    assert(result == false);
+    assert(tasks.empty());
+    assert(output.find("Ошибка загрузки") != std::string::npos);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T6 - loadFromFile() handles invalid ID (not a number)" << std::endl;
+}
+
 int main()
 {
     SetConsoleCP(1251);
@@ -719,6 +748,7 @@ int main()
     test_loadFromFile_statusEncoding_shouldLoadCorrectly();
     test_loadFromFile_noFile_shouldReturnEmptyList();
     test_loadFromFile_corruptedFile_shouldShowErrorAndClearList();
+    test_loadFromFile_invalidId_shouldShowErrorAndClearList();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
