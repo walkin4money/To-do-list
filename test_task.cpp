@@ -570,6 +570,220 @@ void test_saveToFile_writeError_shouldShowErrorMessage()
     std::cout << "PASS: PB-6.T6 - saveToFile() shows error message on write failure" << std::endl;
 }
 
+void test_loadFromFile_singleTask_shouldLoadCorrectly()
+{
+    // Создаём тестовый файл
+    std::string testFile = "test_load_single.csv";
+    std::ofstream file(testFile);
+    file << "1;Купить хлеб;0";
+    file.close();
+
+    std::vector<Task> tasks;
+
+    bool result = loadFromFile(tasks, testFile);
+
+    assert(result == true);
+    assert(tasks.size() == 1);
+    assert(tasks[0].id == 1);
+    assert(tasks[0].description == "Купить хлеб");
+    assert(tasks[0].isCompleted == false);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T2 - loadFromFile() loads single task correctly" << std::endl;
+}
+
+void test_loadFromFile_multipleTasks_shouldLoadAll()
+{
+    std::string testFile = "test_load_multiple.csv";
+    std::ofstream file(testFile);
+    file << "1;Первая;0\n";
+    file << "2;Вторая;1\n";
+    file << "3;Третья;0";
+    file.close();
+
+    std::vector<Task> tasks;
+
+    bool result = loadFromFile(tasks, testFile);
+
+    assert(result == true);
+    assert(tasks.size() == 3);
+    assert(tasks[0].id == 1 && tasks[0].description == "Первая" && tasks[0].isCompleted == false);
+    assert(tasks[1].id == 2 && tasks[1].description == "Вторая" && tasks[1].isCompleted == true);
+    assert(tasks[2].id == 3 && tasks[2].description == "Третья" && tasks[2].isCompleted == false);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T3 - loadFromFile() loads multiple tasks correctly" << std::endl;
+}
+void test_loadFromFile_statusEncoding_shouldLoadCorrectly()
+{
+    std::string testFile = "test_load_status.csv";
+    std::ofstream file(testFile);
+    file << "1;Не выполнена;0\n";
+    file << "2;Выполнена;1";
+    file.close();
+
+    std::vector<Task> tasks;
+
+    loadFromFile(tasks, testFile);
+
+    assert(tasks[0].isCompleted == false);
+    assert(tasks[1].isCompleted == true);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T4 - loadFromFile() loads status correctly (0 and 1)" << std::endl;
+}
+
+void test_loadFromFile_noFile_shouldReturnEmptyList()
+{
+    std::string testFile = "test_non_existent.csv";
+
+    // Убеждаемся, что файла нет
+    std::remove(testFile.c_str());
+
+    std::vector<Task> tasks;
+    tasks.push_back(Task()); // Добавляем что-то, чтобы проверить что очищается
+
+    bool result = loadFromFile(tasks, testFile);
+
+    assert(result == true);
+    assert(tasks.empty());
+
+    std::cout << "PASS: PB-7.T1 - loadFromFile() handles missing file" << std::endl;
+}
+void test_loadFromFile_corruptedFile_shouldShowErrorAndClearList()
+{
+    std::string testFile = "test_corrupted.csv";
+    std::ofstream file(testFile);
+    file << "1;Первая;0\n";
+    file << "это не csv строка\n";
+    file << "3;Третья;1";
+    file.close();
+
+    std::vector<Task> tasks;
+    Task existingTask;
+    existingTask.id = 99;
+    tasks.push_back(existingTask);
+
+    // Перенаправляем вывод
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    bool result = loadFromFile(tasks, testFile);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    assert(result == false);
+    assert(tasks.empty());
+    assert(output.find("Ошибка загрузки") != std::string::npos);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T5 - loadFromFile() handles corrupted file" << std::endl;
+}
+
+void test_loadFromFile_invalidId_shouldShowErrorAndClearList()
+{
+    std::string testFile = "test_invalid_id.csv";
+    std::ofstream file(testFile);
+    file << "abc;Первая;0";  // ID не число
+    file.close();
+
+    std::vector<Task> tasks;
+    tasks.push_back(Task());
+
+    // Перенаправляем вывод
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    bool result = loadFromFile(tasks, testFile);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    assert(result == false);
+    assert(tasks.empty());
+    assert(output.find("Ошибка загрузки") != std::string::npos);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T6 - loadFromFile() handles invalid ID (not a number)" << std::endl;
+}
+
+void test_loadFromFile_invalidStatus_shouldShowErrorAndClearList()
+{
+    std::string testFile = "test_invalid_status.csv";
+    std::ofstream file(testFile);
+    file << "1;Первая;2";  // Статус 2 (не 0 и не 1)
+    file.close();
+
+    std::vector<Task> tasks;
+    tasks.push_back(Task());
+
+    // Перенаправляем вывод
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    bool result = loadFromFile(tasks, testFile);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    assert(result == false);
+    assert(tasks.empty());
+    assert(output.find("Ошибка загрузки") != std::string::npos);
+
+    std::remove(testFile.c_str());
+
+    // Дополнительно проверяем статус 999
+    std::ofstream file2("test_invalid_status2.csv");
+    file2 << "1;Вторая;999";
+    file2.close();
+
+    std::vector<Task> tasks2;
+    tasks2.push_back(Task());
+
+    std::stringstream buffer2;
+    std::streambuf* old2 = std::cout.rdbuf(buffer2.rdbuf());
+
+    result = loadFromFile(tasks2, "test_invalid_status2.csv");
+
+    std::cout.rdbuf(old2);
+
+    assert(result == false);
+    assert(tasks2.empty());
+
+    std::remove("test_invalid_status2.csv");
+
+    std::cout << "PASS: PB-7.T7 - loadFromFile() handles invalid status (not 0 or 1)" << std::endl;
+}
+void test_loadFromFile_descriptionWithSemicolon_shouldLoadCorrectly()
+{
+    std::string testFile = "test_semicolon.csv";
+    std::ofstream file(testFile);
+    file << "1;Описание с;0";  // Описание с разделителем
+    file.close();
+
+    std::vector<Task> tasks;
+
+    bool result = loadFromFile(tasks, testFile);
+
+    // При использовании getline с разделителем ';'
+    // описание обрежется до первого ";"
+    assert(result == true);
+    assert(tasks.size() == 1);
+    assert(tasks[0].id == 1);
+    assert(tasks[0].description == "Описание с");  // Обрезано на ";"
+    assert(tasks[0].isCompleted == false);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T8 - loadFromFile() handles semicolon in description" << std::endl;
+}
+
 
 int main()
 {
@@ -601,6 +815,14 @@ int main()
     test_saveToFile_multipleTasks_shouldSaveAll();
     test_saveToFile_statusEncoding_shouldBeZeroOrOne();
     test_saveToFile_writeError_shouldShowErrorMessage();
+    test_loadFromFile_singleTask_shouldLoadCorrectly();
+    test_loadFromFile_multipleTasks_shouldLoadAll();
+    test_loadFromFile_statusEncoding_shouldLoadCorrectly();
+    test_loadFromFile_noFile_shouldReturnEmptyList();
+    test_loadFromFile_corruptedFile_shouldShowErrorAndClearList();
+    test_loadFromFile_invalidId_shouldShowErrorAndClearList();
+    test_loadFromFile_invalidStatus_shouldShowErrorAndClearList();
+    test_loadFromFile_descriptionWithSemicolon_shouldLoadCorrectly();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

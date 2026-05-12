@@ -1,6 +1,8 @@
 #include "Task.h"
-#include <iostream> 
+#include <iostream>
 #include <fstream>
+#include <sstream>
+#include <string>
 
 bool addTask(std::vector<Task>& tasks, const std::string& description)
 {
@@ -78,5 +80,61 @@ bool saveToFile(const std::vector<Task>& tasks, const std::string& filename)
     }
 
     file.close();
+    return true;
+}
+
+bool loadFromFile(std::vector<Task>& tasks, const std::string& filename)
+{
+    std::ifstream file(filename);
+
+    if (!file.is_open()) {
+        tasks.clear();
+        return true;
+    }
+
+    tasks.clear();
+    std::string line;
+    int loadedCount = 0;
+
+    while (std::getline(file, line)) {
+        if (line.empty()) continue;
+
+        std::stringstream ss(line);
+        std::string idStr, description, statusStr;
+
+        if (!std::getline(ss, idStr, ';') ||
+            !std::getline(ss, description, ';') ||
+            !std::getline(ss, statusStr, ';')) {
+            std::cout << "ќшибка загрузки: файл повреждЄн, начат новый список задач" << std::endl;
+            tasks.clear();
+            return false;
+        }
+
+        try {
+            Task t;
+            t.id = std::stoi(idStr);
+            t.description = description;
+            int status = std::stoi(statusStr);
+
+            // ƒќѕќЋЌ»“≈Ћ№Ќјя ѕ–ќ¬≈– ј: статус должен быть 0 или 1
+            if (status != 0 && status != 1) {
+                std::cout << "ќшибка загрузки: файл повреждЄн, начат новый список задач" << std::endl;
+                tasks.clear();
+                return false;
+            }
+
+            t.isCompleted = (status == 1);
+            tasks.push_back(t);
+            loadedCount++;
+        }
+        catch (...) {
+            std::cout << "ќшибка загрузки: файл повреждЄн, начат новый список задач" << std::endl;
+            tasks.clear();
+            return false;
+        }
+    }
+
+    file.close();
+    std::cout << "«агружено задач: " << loadedCount << std::endl;
     return true;
 }
