@@ -713,6 +713,54 @@ void test_loadFromFile_invalidId_shouldShowErrorAndClearList()
     std::cout << "PASS: PB-7.T6 - loadFromFile() handles invalid ID (not a number)" << std::endl;
 }
 
+void test_loadFromFile_invalidStatus_shouldShowErrorAndClearList()
+{
+    std::string testFile = "test_invalid_status.csv";
+    std::ofstream file(testFile);
+    file << "1;Первая;2";  // Статус 2 (не 0 и не 1)
+    file.close();
+
+    std::vector<Task> tasks;
+    tasks.push_back(Task());
+
+    // Перенаправляем вывод
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    bool result = loadFromFile(tasks, testFile);
+
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    assert(result == false);
+    assert(tasks.empty());
+    assert(output.find("Ошибка загрузки") != std::string::npos);
+
+    std::remove(testFile.c_str());
+
+    // Дополнительно проверяем статус 999
+    std::ofstream file2("test_invalid_status2.csv");
+    file2 << "1;Вторая;999";
+    file2.close();
+
+    std::vector<Task> tasks2;
+    tasks2.push_back(Task());
+
+    std::stringstream buffer2;
+    std::streambuf* old2 = std::cout.rdbuf(buffer2.rdbuf());
+
+    result = loadFromFile(tasks2, "test_invalid_status2.csv");
+
+    std::cout.rdbuf(old2);
+
+    assert(result == false);
+    assert(tasks2.empty());
+
+    std::remove("test_invalid_status2.csv");
+
+    std::cout << "PASS: PB-7.T7 - loadFromFile() handles invalid status (not 0 or 1)" << std::endl;
+}
+
 int main()
 {
     SetConsoleCP(1251);
@@ -749,6 +797,7 @@ int main()
     test_loadFromFile_noFile_shouldReturnEmptyList();
     test_loadFromFile_corruptedFile_shouldShowErrorAndClearList();
     test_loadFromFile_invalidId_shouldShowErrorAndClearList();
+    test_loadFromFile_invalidStatus_shouldShowErrorAndClearList();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }

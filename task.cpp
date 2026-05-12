@@ -87,10 +87,9 @@ bool loadFromFile(std::vector<Task>& tasks, const std::string& filename)
 {
     std::ifstream file(filename);
 
-    // AC4: Если файла нет — пустой список
     if (!file.is_open()) {
         tasks.clear();
-        return true;  // Не ошибка, просто файла нет
+        return true;
     }
 
     tasks.clear();
@@ -103,27 +102,32 @@ bool loadFromFile(std::vector<Task>& tasks, const std::string& filename)
         std::stringstream ss(line);
         std::string idStr, description, statusStr;
 
-        // Разбираем CSV строку
         if (!std::getline(ss, idStr, ';') ||
             !std::getline(ss, description, ';') ||
             !std::getline(ss, statusStr, ';')) {
-            // AC3: файл повреждён
             std::cout << "Ошибка загрузки: файл повреждён, начат новый список задач" << std::endl;
             tasks.clear();
             return false;
         }
 
-        // Проверяем, что ID и статус — числа
         try {
             Task t;
             t.id = std::stoi(idStr);
             t.description = description;
-            t.isCompleted = (std::stoi(statusStr) == 1);
+            int status = std::stoi(statusStr);
+
+            // ДОПОЛНИТЕЛЬНАЯ ПРОВЕРКА: статус должен быть 0 или 1
+            if (status != 0 && status != 1) {
+                std::cout << "Ошибка загрузки: файл повреждён, начат новый список задач" << std::endl;
+                tasks.clear();
+                return false;
+            }
+
+            t.isCompleted = (status == 1);
             tasks.push_back(t);
             loadedCount++;
         }
         catch (...) {
-            // AC3: повреждённые данные
             std::cout << "Ошибка загрузки: файл повреждён, начат новый список задач" << std::endl;
             tasks.clear();
             return false;
@@ -131,9 +135,6 @@ bool loadFromFile(std::vector<Task>& tasks, const std::string& filename)
     }
 
     file.close();
-
-    // AC5: выводим количество загруженных задач
     std::cout << "Загружено задач: " << loadedCount << std::endl;
-
     return true;
 }
