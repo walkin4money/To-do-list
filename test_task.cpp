@@ -616,6 +616,25 @@ void test_loadFromFile_multipleTasks_shouldLoadAll()
 
     std::cout << "PASS: PB-7.T3 - loadFromFile() loads multiple tasks correctly" << std::endl;
 }
+void test_loadFromFile_statusEncoding_shouldLoadCorrectly()
+{
+    std::string testFile = "test_load_status.csv";
+    std::ofstream file(testFile);
+    file << "1;Не выполнена;0\n";
+    file << "2;Выполнена;1";
+    file.close();
+
+    std::vector<Task> tasks;
+
+    loadFromFile(tasks, testFile);
+
+    assert(tasks[0].isCompleted == false);
+    assert(tasks[1].isCompleted == true);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T4 - loadFromFile() loads status correctly (0 and 1)" << std::endl;
+}
 
 int main()
 {
@@ -649,6 +668,7 @@ int main()
     test_saveToFile_writeError_shouldShowErrorMessage();
     test_loadFromFile_singleTask_shouldLoadCorrectly();
     test_loadFromFile_multipleTasks_shouldLoadAll();
+    test_loadFromFile_statusEncoding_shouldLoadCorrectly();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
