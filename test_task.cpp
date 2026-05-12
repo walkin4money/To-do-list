@@ -570,6 +570,28 @@ void test_saveToFile_writeError_shouldShowErrorMessage()
     std::cout << "PASS: PB-6.T6 - saveToFile() shows error message on write failure" << std::endl;
 }
 
+void test_loadFromFile_singleTask_shouldLoadCorrectly()
+{
+    // Создаём тестовый файл
+    std::string testFile = "test_load_single.csv";
+    std::ofstream file(testFile);
+    file << "1;Купить хлеб;0";
+    file.close();
+
+    std::vector<Task> tasks;
+
+    bool result = loadFromFile(tasks, testFile);
+
+    assert(result == true);
+    assert(tasks.size() == 1);
+    assert(tasks[0].id == 1);
+    assert(tasks[0].description == "Купить хлеб");
+    assert(tasks[0].isCompleted == false);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T2 - loadFromFile() loads single task correctly" << std::endl;
+}
 
 int main()
 {
@@ -601,6 +623,7 @@ int main()
     test_saveToFile_multipleTasks_shouldSaveAll();
     test_saveToFile_statusEncoding_shouldBeZeroOrOne();
     test_saveToFile_writeError_shouldShowErrorMessage();
+    test_loadFromFile_singleTask_shouldLoadCorrectly();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
