@@ -527,6 +527,49 @@ void test_saveToFile_statusEncoding_shouldBeZeroOrOne()
     std::cout << "PASS: PB-6.T4 - saveToFile() encodes status as 0 and 1" << std::endl;
 }
 
+void test_saveToFile_writeError_shouldShowErrorMessage()
+{
+    std::vector<Task> tasks;
+
+    Task t1;
+    t1.id = 1;
+    t1.description = "Тестовая задача";
+    t1.isCompleted = false;
+    tasks.push_back(t1);
+
+    // Создаём файл и делаем его read-only
+    std::string testFile = "test_readonly.csv";
+
+    // Сначала создаём файл
+    std::ofstream dummy(testFile);
+    dummy.close();
+
+    // Делаем файл только для чтения (Windows)
+    SetFileAttributesA(testFile.c_str(), FILE_ATTRIBUTE_READONLY);
+
+    // Перенаправляем вывод
+    std::stringstream buffer;
+    std::streambuf* old = std::cout.rdbuf(buffer.rdbuf());
+
+    bool result = saveToFile(tasks, testFile);
+
+    // Восстанавливаем вывод
+    std::cout.rdbuf(old);
+    std::string output = buffer.str();
+
+    // Проверяем, что функция вернула false
+    assert(result == false);
+
+    // Проверяем, что выведено сообщение об ошибке
+    assert(output.find("Ошибка сохранения данных") != std::string::npos);
+
+    // Убираем read-only атрибут и удаляем файл
+    SetFileAttributesA(testFile.c_str(), FILE_ATTRIBUTE_NORMAL);
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-6.T6 - saveToFile() shows error message on write failure" << std::endl;
+}
+
 
 int main()
 {
@@ -557,6 +600,7 @@ int main()
     test_saveToFile_singleTask_shouldSaveCorrectly();
     test_saveToFile_multipleTasks_shouldSaveAll();
     test_saveToFile_statusEncoding_shouldBeZeroOrOne();
+    test_saveToFile_writeError_shouldShowErrorMessage();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
