@@ -60,6 +60,7 @@ bool saveToFile(const std::vector<Task>& tasks, const std::string& filename)
 {
     std::ofstream file(filename);
     if (!file.is_open()) {
+        std::cout << "Ошибка сохранения данных" << std::endl;
         return false;
     }
 
@@ -67,6 +68,13 @@ bool saveToFile(const std::vector<Task>& tasks, const std::string& filename)
         file << task.id << ";"
             << task.description << ";"
             << (task.isCompleted ? 1 : 0) << std::endl;
+
+        // Проверяем ошибку записи
+        if (file.fail()) {
+            std::cout << "Ошибка сохранения данных" << std::endl;
+            file.close();
+            return false;
+        }
     }
 
     file.close();
