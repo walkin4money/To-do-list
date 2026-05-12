@@ -593,6 +593,30 @@ void test_loadFromFile_singleTask_shouldLoadCorrectly()
     std::cout << "PASS: PB-7.T2 - loadFromFile() loads single task correctly" << std::endl;
 }
 
+void test_loadFromFile_multipleTasks_shouldLoadAll()
+{
+    std::string testFile = "test_load_multiple.csv";
+    std::ofstream file(testFile);
+    file << "1;Первая;0\n";
+    file << "2;Вторая;1\n";
+    file << "3;Третья;0";
+    file.close();
+
+    std::vector<Task> tasks;
+
+    bool result = loadFromFile(tasks, testFile);
+
+    assert(result == true);
+    assert(tasks.size() == 3);
+    assert(tasks[0].id == 1 && tasks[0].description == "Первая" && tasks[0].isCompleted == false);
+    assert(tasks[1].id == 2 && tasks[1].description == "Вторая" && tasks[1].isCompleted == true);
+    assert(tasks[2].id == 3 && tasks[2].description == "Третья" && tasks[2].isCompleted == false);
+
+    std::remove(testFile.c_str());
+
+    std::cout << "PASS: PB-7.T3 - loadFromFile() loads multiple tasks correctly" << std::endl;
+}
+
 int main()
 {
     SetConsoleCP(1251);
@@ -624,6 +648,7 @@ int main()
     test_saveToFile_statusEncoding_shouldBeZeroOrOne();
     test_saveToFile_writeError_shouldShowErrorMessage();
     test_loadFromFile_singleTask_shouldLoadCorrectly();
+    test_loadFromFile_multipleTasks_shouldLoadAll();
     std::cout << "All tests passed." << std::endl;
     return 0;
 }
