@@ -5,37 +5,7 @@
 #include <windows.h>
 #include "Task.h"
 
-const std::string DATA_FILE = "tasks.csv";  // Имя файла для сохранения
-
-void loadFromFile(std::vector<Task>& tasks, const std::string& filename)
-{
-    std::ifstream file(filename);
-    if (!file.is_open()) {
-        return;  // Файла нет — пустой список
-    }
-
-    tasks.clear();
-    std::string line;
-
-    while (std::getline(file, line)) {
-        if (line.empty()) continue;
-
-        std::stringstream ss(line);
-        std::string idStr, description, statusStr;
-
-        std::getline(ss, idStr, ';');
-        std::getline(ss, description, ';');
-        std::getline(ss, statusStr, ';');
-
-        Task t;
-        t.id = std::stoi(idStr);
-        t.description = description;
-        t.isCompleted = (std::stoi(statusStr) == 1);
-        tasks.push_back(t);
-    }
-
-    file.close();
-}
+const std::string DATA_FILE = "tasks.csv";
 
 int main()
 {
@@ -44,7 +14,8 @@ int main()
 
     std::vector<Task> tasks;
 
-    // Загружаем задачи при старте
+    // S2: Загружаем задачи при запуске
+    std::cout << "Загрузка задач из файла..." << std::endl;
     loadFromFile(tasks, DATA_FILE);
 
     int choice;
